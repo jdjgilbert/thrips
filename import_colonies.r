@@ -4,6 +4,7 @@
 ### Original data 2: branchdata.csv
 ### Location: ~/Dropbox/2015/work/2015 thrips/2015/
 
+setwd('~/Dropbox/2015/work/2015 thrips/')
 dat <- read.csv('2015/2015-02-12 colonydata Alice.csv')
 branch <- read.csv('branchdata.csv')
 
@@ -116,7 +117,11 @@ dat.all$stage1[which(dat.all$alates>0 & (dat.all$emerged - (dat.all$NI + dat.all
 
 dat.all$stage1[dat.all$stage1=='ACTIVE-TEN']<-'ACTIVE-ALATES'
 
-dat <- subset(dat.all, !STAGE%in%c('OLD','ABANDONED','EXCLUDE','NO EGGS','NO  EGGS', 'DISPERSED','UNDER CONSTRUCTION','INCOMPLETE') & SPECIES%in%c('ANEURAE','ANEURIAE'))
-dat <- dat[-grep('DIPTERA|XANIOTHRIPS', dat$OTHER.ID),]
+nrow(dat <- subset(dat.all, !STAGE%in%c('OLD','ABANDONED','EXCLUDE','NO EGGS','NO  EGGS', 'DISPERSED','UNDER CONSTRUCTION','INCOMPLETE') & SPECIES%in%c('ANEURAE','ANEURIAE')))
+# [1] 395
+
+nrow(dat <- dat[-grep('DIPTERA|XANIOTHRIPS', dat$OTHER.ID),])
+# [1] 388
+
 dat$COLID <- paste(dat$TREE, dat$BRANCH, dat$COLONY, sep='.')
 
