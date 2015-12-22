@@ -125,3 +125,4 @@ nrow(dat <- dat[-grep('DIPTERA|XANIOTHRIPS', dat$OTHER.ID),])
 
 dat$COLID <- paste(dat$TREE, dat$BRANCH, dat$COLONY, sep='.')
 
+#test
