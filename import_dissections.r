@@ -3,10 +3,10 @@
 #### Filename: 2013/2013-11-25 dissections.csv
 #### Location: ~/Dropbox/2015/work/2015 thrips/2015/
 
-### Script taken from: thrips-dissection-4-2015-08-04.r
+  ### Script taken from: thrips-dissection-4-2015-08-04.r
 
-setwd('~/Dropbox/2015/work/2015 thrips/')
-dis <- read.csv('2013/2013-11-25 dissections.csv', skip=1, header=T, colClasses='character')
+#setwd('~/Dropbox/2015/work/2015 thrips/')
+dis <- read.csv('Data/2013-11-25 dissections.csv', skip=1, header=T, colClasses='character')
 
 ## replace all blanks with NA
 dis <- data.frame(apply(dis, 2, function(x) gsub("^$", NA, as.character(x))))
@@ -52,6 +52,11 @@ dis$chorvol[!is.na(dis$CHORION.OOCYTES)] <- sapply(which(!is.na(dis$CHORION.OOCY
 
 # 2015-08-04: Calculate oocyte volume in cubic mm using 1 reticle unit = 1000/50 = 20 um
 dis$oovol <- sapply(1:nrow(dis), function(x) with(dis[x,], sum(c(0, pi * (OOCYTE1LEN*20) * ((OOCYTE1WID*20)/2)^2, pi * (OOCYTE2LEN*20)* ((OOCYTE2WID*20)/2)^2, pi * (OOCYTE3LEN*20) * ((OOCYTE3WID*20)/2)^2), na.rm=T))) / 1e+06
+
+#### Amendment pasted from analysis of repro status and nest volume (2015-12-23)
+dis$oovol[dis$ID.NEST=='F11.2' & dis$INDIVIDUAL=='2'] <- NA
+
+
 
 ## Calculate total vol of developing oocytes
 #dis$oocyte <- sapply(1:nrow(dis), function(x) with(dis[x,], sum(c(OOCYTE1LEN*OOCYTE1WID, OOCYTE2LEN*OOCYTE2WID, OOCYTE3LEN*OOCYTE3WID), na.rm=T)))
@@ -112,4 +117,51 @@ nrow(dis.arm <- subset(dis.all, SPECIES == 'ARMATUS'))  ## 27
 
 ### Majority of work is just with aneurae
 nrow(dis <- dis.anu)
+
+
+#### Make nest-level dataset pasted from analysis of repro status and nest volume NOT from original at thrips-dissection-4-2015-08-04.r
+  cv<-function(x)(  ### Function to calculate coefficient of variation 
+  100*sd(x)/mean(x, na.rm=T)
+) 
+ 
+ # get "nest" code from thrips-dissection-3-2015-07-13.r  -- have added oovol to this
+nrow(nest <- data.frame(
+  id = sort(unique(dis$ID.NEST[dis$F.STATE=='DEALATE'])),
+  nonrepro = with(subset(dis, F.STATE=='DEALATE'), as.matrix(table(ID.NEST, repro)))[,1],
+  repro = with(subset(dis, F.STATE=='DEALATE'), as.matrix(table(ID.NEST, repro)))[,2],
+  nonchorion = with(subset(dis, F.STATE=='DEALATE'), as.matrix(table(ID.NEST, chorion)))[,1],
+  chorion = with(subset(dis, F.STATE=='DEALATE'), as.matrix(table(ID.NEST, chorion)))[,2],
+  nonrepair = with(subset(dis, F.STATE=='DEALATE'), as.matrix(table(ID.NEST, (REPAIR!=0))))[,1],
+  repair = with(subset(dis, F.STATE=='DEALATE'), as.matrix(table(ID.NEST, (REPAIR!=0))))[,2],
+  oovol = with(subset(dis, F.STATE=='DEALATE'), as.matrix(tapply(oovol, ID.NEST, mean, na.rm=T))),
+  rep.oovol = with(subset(dis, F.STATE=='DEALATE'), as.matrix(tapply( (c(NA, 1)[1+(oovol>0)] * oovol) , ID.NEST, mean, na.rm=T))),
+  oocv = with(subset(dis, F.STATE=='DEALATE'), as.matrix(tapply(oovol, ID.NEST, cv))),
+  stage = dis$NEST.STAGE[match(sort(unique(dis$ID.NEST[dis$F.STATE=='DEALATE'])), dis$ID.NEST)],
+  stage0 = dis$stage0[match(sort(unique(dis$ID.NEST[dis$F.STATE=='DEALATE'])), dis$ID.NEST)],
+  stage1 = dis$stage1[match(sort(unique(dis$ID.NEST[dis$F.STATE=='DEALATE'])), dis$ID.NEST)],
+  stage2 = dis$stage2[match(sort(unique(dis$ID.NEST[dis$F.STATE=='DEALATE'])), dis$ID.NEST)],
+  stage3 = dis$stage3[match(sort(unique(dis$ID.NEST[dis$F.STATE=='DEALATE'])), dis$ID.NEST)],
+  stage4 = dis$stage4[match(sort(unique(dis$ID.NEST[dis$F.STATE=='DEALATE'])), dis$ID.NEST)],
+  nymphs = dis$NYMPHS[match(sort(unique(dis$ID.NEST[dis$F.STATE=='DEALATE'])), dis$ID.NEST)],
+  vol = dis$nestvol[match(sort(unique(dis$ID.NEST[dis$F.STATE=='DEALATE'])), dis$ID.NEST)],
+  datvol = dat$vol[match(sort(unique(dis$ID.NEST[dis$F.STATE=='DEALATE'])), dat$colid)],
+  foundress = as.numeric(as.character(dis$FOUNDRESS[match(sort(unique(dis$ID.NEST[dis$F.STATE=='DEALATE'])), dis$ID.NEST)])),
+  present =   as.numeric(as.character(dis$PRESENT[match(sort(unique(dis$ID.NEST[dis$F.STATE=='DEALATE'])), dis$ID.NEST)])),
+  offspring =   as.numeric(as.character(dat$offspring[match(sort(unique(dis$ID.NEST[dis$F.STATE=='DEALATE'])), dat$colid)])),
+  alates =   as.numeric(as.character(dat$alates[match(sort(unique(dis$ID.NEST[dis$F.STATE=='DEALATE'])), dat$colid)]))
+))  ## 164
+
+nest$vol[is.na(nest$vol)]<-nest$datvol[is.na(nest$vol)]  ## fill in some blanks using dat$vol
+nest$join <- nest$present > nest$foundress
+nest$prop.nonrepro <- nest$nonrepro/(nest$nonrepro+nest$repro)
+nest$nrbin <- (nest$prop.nonrepro>0)
+nest$females <- nest$repro + nest$nonrepro
+
+
+### Now add columns to dis with nest-level traits we have just calculated
+head(dis$females <- nest$females[match(dis$ID.NEST, nest$id)])
+# [1] 2 2 2 2 2 2
+head(dis$no.repro <- nest$repro[match(dis$ID.NEST, nest$id)])
+head(dis$no.nonrepro <- nest$nonrepro[match(dis$ID.NEST, nest$id)])
+
 

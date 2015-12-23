@@ -4,9 +4,10 @@
 ### Original data 2: branchdata.csv
 ### Location: ~/Dropbox/2015/work/2015 thrips/2015/
 
-setwd('~/Dropbox/2015/work/2015 thrips/')
-dat <- read.csv('2015/2015-02-12 colonydata Alice.csv')
-branch <- read.csv('branchdata.csv')
+#setwd('~/Dropbox/2015/work/2015 thrips/')
+#dat <- read.csv('2015/2015-02-12 colonydata Alice.csv')
+dat <- read.csv('Data/2015-02-12 colonydata Alice.csv')
+branch <- read.csv('Data/branchdata.csv')
 
 dat$SITE[dat$SITE=='BALD HILLS']<-'BH'
 dat$colid <- paste(dat$SITE, paste(dat$TREE, dat$BRANCH, dat$COLONY, sep='.'), sep='')
