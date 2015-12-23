@@ -256,9 +256,9 @@ dis1 <- subset(dis, nestvol < 450 & !is.na(nestvol))
 
 ###### Next: analyse as a MIXED MODEL  while accounting for individual size as indicated by 2015-08-03 ovaries vs body size.r
 
-dis$devoocyte <- NA
-dis$devoocyte[dis$oocyte==0] <- 'No'
-dis$devoocyte[dis$oocyte>0] <- 'Yes'
+# dis$devoocyte <- NA                     ### Migrated to import.dissections.r
+# dis$devoocyte[dis$oocyte==0] <- 'No'
+# dis$devoocyte[dis$oocyte>0] <- 'Yes'
 
 dis1 <- subset(dis, nestvol < 450 & !is.na(nestvol))  ### remove outlier nests
 

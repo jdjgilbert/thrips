@@ -60,7 +60,19 @@ dis$oovol[dis$ID.NEST=='F11.2' & dis$INDIVIDUAL=='2'] <- NA
 
 ## Calculate total vol of developing oocytes
 #dis$oocyte <- sapply(1:nrow(dis), function(x) with(dis[x,], sum(c(OOCYTE1LEN*OOCYTE1WID, OOCYTE2LEN*OOCYTE2WID, OOCYTE3LEN*OOCYTE3WID), na.rm=T)))
+dis$devoocyte <- NA
+dis$devoocyte[dis$oocyte==0] <- 'No'
+dis$devoocyte[dis$oocyte>0] <- 'Yes'
 
+
+## calculate pronotum width with 15X eyepiece and 5X objective
+ ## exactly 25 divisions per mm
+ # 1mm = 1000um
+ # Thus 1 reticle unit = 1000/50 = 20 um
+ dis$pronotum <- dis$PRONOT.50 * 20
+ with(subset(dis, !is.na(oocyte)), range(pronotum, na.rm=T))
+# [1] 240 360
+  
 ## salivary gland volume
 dis$sgvol <- with(dis, pi * (SGWID/2)^2 * SGLEN)
 
