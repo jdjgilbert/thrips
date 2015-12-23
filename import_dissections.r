@@ -56,7 +56,9 @@ dis$oovol <- sapply(1:nrow(dis), function(x) with(dis[x,], sum(c(0, pi * (OOCYTE
 #### Amendment pasted from analysis of repro status and nest volume (2015-12-23)
 dis$oovol[dis$ID.NEST=='F11.2' & dis$INDIVIDUAL=='2'] <- NA
 
-
+### Amendment pasted in from oocyte volume analysis (analysis_oocytevol_vs_nestvol.r)
+dis$oovol[is.na(dis$repro)]<-NA
+dis$repro[dis$repro==F & dis$oovol > 1000] <- T   ### if problems, check placement of this amendment
 
 ## Calculate total vol of developing oocytes
 #dis$oocyte <- sapply(1:nrow(dis), function(x) with(dis[x,], sum(c(OOCYTE1LEN*OOCYTE1WID, OOCYTE2LEN*OOCYTE2WID, OOCYTE3LEN*OOCYTE3WID), na.rm=T)))
@@ -177,3 +179,17 @@ head(dis$no.repro <- nest$repro[match(dis$ID.NEST, nest$id)])
 head(dis$no.nonrepro <- nest$nonrepro[match(dis$ID.NEST, nest$id)])
 
 
+####  Make nest-level dissection dataset
+ndis <- subset(dis, !is.na(nestvol) & !is.na(oovol) & oovol > 0, select=c('oovol','nestvol','FOUNDRESSES', 'repro', 'ID.NEST','pronotum'))
+ndis$no.nonrepro <- nest$nonrepro[match(ndis$ID.NEST, nest$id)]
+ndis$no.repro <- nest$repro[match(ndis$ID.NEST, nest$id)]
+ndis$offspring <- nest$offspring[match(ndis$ID.NEST, nest$id)]
+ndis$prop.nonrepro <- ndis$no.nonrepro/I(ndis$no.nonrepro+ndis$no.repro)
+ndis$females <- ndis$no.repro + ndis$no.nonrepro
+ndis$nrbin <- I(ndis$prop.nonrepro>0)
+ndis$fcut <- factor(as.numeric(factor(cut(ndis$FOUNDRESSES, breaks=c(0, 1.5, 30)))))  ## cut into 1 and >1 foundresses
+
+ 
+### Amendment pasted in from oocyte volume analysis (analysis_oocytevol_vs_nestvol.r)
+nest$repro[which(nest$id=='I2-7')] <- 2
+nest$nonrepro[which(nest$id=='I2-7')] <- 0

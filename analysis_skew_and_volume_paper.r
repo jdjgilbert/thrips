@@ -22,5 +22,12 @@ ls()
 source('analysis_offspring_vs_nestvolume.r')
 
 ### 3. ##########   DOMICILE VOLUME AND REPRODUCTIVE STATUS -- SEE MIXED MODEL AT BOTTOM ####################
-
 source('analysis_repro_status_vs_nestvolume.r')
+
+
+####### 4. REPRODUCTIVE COMPETITION AND OOCYTE VOLUME ####################
+source('analysis_oocytevol_vs_nestvol.r')
+
+
+
+
