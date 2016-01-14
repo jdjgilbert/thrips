@@ -132,6 +132,9 @@ nrow(dis.arm <- subset(dis.all, SPECIES == 'ARMATUS'))  ## 27
 ### Majority of work is just with aneurae
 nrow(dis <- dis.anu)
 
+dis1 <- subset(dis, nestvol < 450 & !is.na(nestvol))  
+    ### remove outlier nests for repro status mixed model analysis
+    ### (analysis_repro_status_vs_nestvolume.r)
 
 #### Make nest-level dataset pasted from analysis of repro status and nest volume NOT from original at thrips-dissection-4-2015-08-04.r
   cv<-function(x)(  ### Function to calculate coefficient of variation 
@@ -165,12 +168,15 @@ nrow(nest <- data.frame(
   alates =   as.numeric(as.character(dat$alates[match(sort(unique(dis$ID.NEST[dis$F.STATE=='DEALATE'])), dat$colid)]))
 ))  ## 164
 
+ ### Amendment pasted in from oocyte volume analysis (analysis_oocytevol_vs_nestvol.r)
+nest$repro[which(nest$id=='I2-7')] <- 2
+nest$nonrepro[which(nest$id=='I2-7')] <- 0
+
 nest$vol[is.na(nest$vol)]<-nest$datvol[is.na(nest$vol)]  ## fill in some blanks using dat$vol
 nest$join <- nest$present > nest$foundress
 nest$prop.nonrepro <- nest$nonrepro/(nest$nonrepro+nest$repro)
 nest$nrbin <- (nest$prop.nonrepro>0)
 nest$females <- nest$repro + nest$nonrepro
-
 
 ### Now add columns to dis with nest-level traits we have just calculated
 head(dis$females <- nest$females[match(dis$ID.NEST, nest$id)])
@@ -188,8 +194,6 @@ ndis$prop.nonrepro <- ndis$no.nonrepro/I(ndis$no.nonrepro+ndis$no.repro)
 ndis$females <- ndis$no.repro + ndis$no.nonrepro
 ndis$nrbin <- I(ndis$prop.nonrepro>0)
 ndis$fcut <- factor(as.numeric(factor(cut(ndis$FOUNDRESSES, breaks=c(0, 1.5, 30)))))  ## cut into 1 and >1 foundresses
-
  
-### Amendment pasted in from oocyte volume analysis (analysis_oocytevol_vs_nestvol.r)
-nest$repro[which(nest$id=='I2-7')] <- 2
-nest$nonrepro[which(nest$id=='I2-7')] <- 0
+nrow(ndis1 <- subset(ndis, females < 6))
+## 133 (2016-01-14)

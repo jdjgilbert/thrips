@@ -17,94 +17,92 @@
 
 
 ########### 2015-07-28 
+### Too complicated, decided not to use
+### In multiple nests, oocyte volume predicts offspring, but not in single nests -- this is 
 
-## First: is oocyte volume related to # of offspring?  A: yes, but only in multiple nests
-#	
-glm1 <- with(ndis, glm(offspring ~ log(oovol) * fcut, family='quasipoisson'))
-anova(glm1, test='Chi')
-#	Analysis of Deviance Table
-#	
-#	Model: quasipoisson, link: log
-#	
-#	Response: offspring
-#	
-#	Terms added sequentially (first to last)
-#	
-#	
-#	Df Deviance Resid. Df Resid. Dev Pr(>Chi)   
-#	NULL                               29    102.206            
-#	log(oovol)       1   3.8635        28     98.343 0.236551   
-#	fcut             1   0.1474        27     98.196 0.817176   
-#	log(oovol):fcut  1  22.1832        26     76.012 0.004564 **
-#	---
-#	Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+#     ## First: is oocyte volume related to # of offspring?  A: yes, but only in multiple nests
+#     #	
+#     glm1 <- with(ndis, glm(offspring ~ log(oovol) * fcut, family='quasipoisson'))
+#     anova(glm1, test='Chi')
+#     #	Analysis of Deviance Table
+#     #	
+#     #	Model: quasipoisson, link: log
+#     #	
+#     #	Response: offspring
+#     #	
+#     #	Terms added sequentially (first to last)
+#     #	
+#     #	
+#     #	Df Deviance Resid. Df Resid. Dev Pr(>Chi)   
+#     #	NULL                               29    102.206            
+#     #	log(oovol)       1   3.8635        28     98.343 0.236551   
+#     #	fcut             1   0.1474        27     98.196 0.817176   
+#     #	log(oovol):fcut  1  22.1832        26     76.012 0.004564 **
+#     #	---
+#     #	Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+#     
+#     #####     Df Deviance Resid. Df Resid. Dev Pr(>Chi)             ### 2015 results - DFs different, check this
+#     #####     NULL                               28    100.113           
+#     #####     log(oovol)       1   2.7627        27     97.351  0.31065  
+#     #####     fcut             1  17.4065        26     79.944  0.01093 *
+#     #####     log(oovol):fcut  1   6.9324        25     73.012  0.10827  
+#     
+#     summary(glm1)
+#     #	
+#     #	Call:
+#     #	glm(formula = offspring ~ log(oovol) * fcut, family = "quasipoisson")
+#     #	
+#     #	Deviance Residuals: 
+#     #	Min       1Q   Median       3Q      Max  
+#     #	-3.0524  -1.5534  -0.1032   1.2686   2.4439  
+#     #	
+#     #	Coefficients:
+#     #	Estimate Std. Error t value Pr(>|t|)   
+#     #	(Intercept)       -1.4293     1.2161  -1.175  0.25050   
+#     #	log(oovol)         0.6020     0.1993   3.021  0.00560 **
+#     #	fcut1              4.0183     1.4699   2.734  0.01112 * 
+#     #	log(oovol):fcut1  -0.7048     0.2487  -2.833  0.00878 **
+#     #	---
+#     #	Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+#     #	
+#     #	(Dispersion parameter for quasipoisson family taken to be 2.757586)
+#     #	
+#     #	Null deviance: 102.206  on 29  degrees of freedom
+#     #	Residual deviance:  76.012  on 26  degrees of freedom
+#     #	(172 observations deleted due to missingness)
+#     #	AIC: NA
+#     #	
+#     #	Number of Fisher Scoring iterations: 5
+#     #	
+#     
+#     ################  2015 results - check discrepancy
+#     ####      Call:
+#     ####        glm(formula = offspring ~ log(oovol) * fcut, family = "quasipoisson")
+#     ####      
+#     ####      Deviance Residuals: 
+#     ####        Min        1Q    Median        3Q       Max  
+#     ####      -2.81118  -1.40429   0.08444   1.02740   2.62312  
+#     ####      
+#     ####      Coefficients:
+#     ####        Estimate Std. Error t value Pr(>|t|)    
+#     ####      (Intercept)        1.8559     0.1679  11.053 4.09e-11 ***
+#     ####        log(oovol)        -0.1297     0.1716  -0.756    0.457    
+#     ####      fcut2              0.1723     0.3686   0.467    0.644    
+#     ####      log(oovol):fcut2   0.4503     0.2820   1.597    0.123    
+#     ####      ---
+#     ####        Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+#     ####      
+#     ####      (Dispersion parameter for quasipoisson family taken to be 2.687681)
+#     ####      
+#     ####      Null deviance: 100.113  on 28  degrees of freedom
+#     ####      Residual deviance:  73.012  on 25  degrees of freedom
+#     ####      (118 observations deleted due to missingness)
+#     ####      AIC: NA
+#     ####      
+#     ####      Number of Fisher Scoring iterations: 5
+#     
 
-#####     Df Deviance Resid. Df Resid. Dev Pr(>Chi)             ### 2015 results - DFs different, check this
-#####     NULL                               28    100.113           
-#####     log(oovol)       1   2.7627        27     97.351  0.31065  
-#####     fcut             1  17.4065        26     79.944  0.01093 *
-#####     log(oovol):fcut  1   6.9324        25     73.012  0.10827  
-
-summary(glm1)
-#	
-#	Call:
-#	glm(formula = offspring ~ log(oovol) * fcut, family = "quasipoisson")
-#	
-#	Deviance Residuals: 
-#	Min       1Q   Median       3Q      Max  
-#	-3.0524  -1.5534  -0.1032   1.2686   2.4439  
-#	
-#	Coefficients:
-#	Estimate Std. Error t value Pr(>|t|)   
-#	(Intercept)       -1.4293     1.2161  -1.175  0.25050   
-#	log(oovol)         0.6020     0.1993   3.021  0.00560 **
-#	fcut1              4.0183     1.4699   2.734  0.01112 * 
-#	log(oovol):fcut1  -0.7048     0.2487  -2.833  0.00878 **
-#	---
-#	Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
-#	
-#	(Dispersion parameter for quasipoisson family taken to be 2.757586)
-#	
-#	Null deviance: 102.206  on 29  degrees of freedom
-#	Residual deviance:  76.012  on 26  degrees of freedom
-#	(172 observations deleted due to missingness)
-#	AIC: NA
-#	
-#	Number of Fisher Scoring iterations: 5
-#	
-
-################  2015 results - check discrepancy
-####      Call:
-####        glm(formula = offspring ~ log(oovol) * fcut, family = "quasipoisson")
-####      
-####      Deviance Residuals: 
-####        Min        1Q    Median        3Q       Max  
-####      -2.81118  -1.40429   0.08444   1.02740   2.62312  
-####      
-####      Coefficients:
-####        Estimate Std. Error t value Pr(>|t|)    
-####      (Intercept)        1.8559     0.1679  11.053 4.09e-11 ***
-####        log(oovol)        -0.1297     0.1716  -0.756    0.457    
-####      fcut2              0.1723     0.3686   0.467    0.644    
-####      log(oovol):fcut2   0.4503     0.2820   1.597    0.123    
-####      ---
-####        Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
-####      
-####      (Dispersion parameter for quasipoisson family taken to be 2.687681)
-####      
-####      Null deviance: 100.113  on 28  degrees of freedom
-####      Residual deviance:  73.012  on 25  degrees of freedom
-####      (118 observations deleted due to missingness)
-####      AIC: NA
-####      
-####      Number of Fisher Scoring iterations: 5
-
-
-
-
-### So in multiple nests, oocyte volume predicts offspring, but not in single nests -- this is too complicated, decided not to use
-
-#	par(mfrow=c(1,2))
+   #	par(mfrow=c(1,2))
 #	with(subset(ndis), plot(offspring~log(oovol), type='n'))
 #	with(subset(ndis, no.repro==1), points(offspring~log(oovol), pch=16))
 #	with(subset(ndis), plot(offspring~log(oovol), type='n'))
@@ -112,90 +110,89 @@ summary(glm1)
 
 ## Oovol strongly bimodal
 
-with(subset(dat, foundress==1), plot(offspring~log(vol)))
+#with(subset(dat, foundress==1), plot(offspring~log(vol)))
 
 ### Offspring not strongly bimodal in singleton nests
 
-
-
-with(ndis, xyplot(log(oovol) ~ nestvol | females > 1))
+#with(ndis, xyplot(log(oovol) ~ nestvol | females > 1))
 
 
 library(lmerTest)  ### changes anova.lmer slightly - and works differently when using the update() function - not sure why
 ### decided to trust the more generic anova(lmer1, lmer2) over lmerTest's anova(lmer)
 
-ndis1 <- subset(ndis, females < 6)
-#ndis1 <- subset(ndis) ## not used
-#	lmer0 <- lmer(log(oovol) ~ nestvol * nrbin * females + (1 | ID.NEST), data=ndis1, REML='F'); anova(lmer0)
-#	lmer1 <- lmer(log(oovol) ~ (nestvol + nrbin + females)^2 + (1 | ID.NEST), data=ndis1, REML='F'); anova(lmer1)
-#	lmer2 <- lmer(log(oovol) ~ nestvol + nrbin + females + nestvol:females + nrbin:females + (1 | ID.NEST), data=ndis1, REML='F'); anova(lmer2)
-#	lmer3 <- lmer(log(oovol) ~ nestvol + nrbin + females + nrbin:females + (1 | ID.NEST), data=ndis1, REML='F'); anova(lmer3)
-#	lmer4 <- lmer(log(oovol) ~ nrbin + females + nrbin:females + (1 | ID.NEST), data=ndis1, REML='F'); anova(lmer4)
-#	lmer5 <- lmer(log(oovol) ~ nrbin + females + (1 | ID.NEST), data=ndis1, REML='F'); anova(lmer5)
-#	lmer6 <- lmer(log(oovol) ~ nrbin + (1 | ID.NEST), data=ndis1, REML='F'); anova(lmer6)
 
-lmer0 <- lmer(log(oovol) ~ nestvol * nrbin * females + (1 | ID.NEST), data=ndis1, REML='F'); anova(lmer0)
-lmer1 <- update(lmer0, ~.-nestvol:nrbin:females); anova(lmer0, lmer1); anova(lmer1)
-lmer2 <- update(lmer1, ~.-nrbin:nestvol); anova(lmer1, lmer2); anova(lmer2)
-lmer3 <- update(lmer2, ~.-females:nestvol); anova(lmer2, lmer3); anova(lmer3)
-lmer4 <- update(lmer3, ~.-females:nrbin); anova(lmer3, lmer4); anova(lmer4)
-lmer5 <- update(lmer4, ~.-females); anova(lmer4, lmer5); anova(lmer5)
-lmer6 <- update(lmer5, ~.-nrbin); anova(lmer5, lmer6); anova(lmer6)
-#	Data: ndis1
-#	Models:
-#	lmer6: log(oovol) ~ nestvol + (1 | ID.NEST)
-#	lmer5: log(oovol) ~ nestvol + nrbin + (1 | ID.NEST)
-#	      Df    AIC    BIC  logLik deviance  Chisq Chi Df Pr(>Chisq)  
-#	lmer6  4 375.53 387.09 -183.76   367.53                           
-#	lmer5  5 371.39 385.85 -180.70   361.39 6.1336      1    0.01326 *
-#	---
-#	Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
-#	Analysis of Variance Table
-#	        Df Sum Sq Mean Sq F value
-#	nestvol  1 2.6805  2.6805  5.5143
-
-lmer7 <- update(lmer5, ~.-nestvol); anova(lmer5, lmer7)
-#	Data: ndis1
-#	Models:
-#	lmer7: log(oovol) ~ nrbin + (1 | ID.NEST)
-#	lmer5: log(oovol) ~ nestvol + nrbin + (1 | ID.NEST)
-#	      Df    AIC    BIC  logLik deviance  Chisq Chi Df Pr(>Chisq)  
-#	lmer7  4 374.23 385.79 -183.12   366.23                           
-#	lmer5  5 371.39 385.85 -180.70   361.39 4.8384      1    0.02783 *
-#	---
-#	Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
-
-
-summary(lmer5)
-#	Linear mixed model fit by maximum likelihood  ['lmerMod']
-#	Formula: log(oovol) ~ nestvol + nrbin + (1 | ID.NEST)
-#	   Data: ndis1
-#	
-#	     AIC      BIC   logLik deviance df.resid 
-#	   371.4    385.8   -180.7    361.4      128 
-#	
-#	Scaled residuals: 
-#	     Min       1Q   Median       3Q      Max 
-#	-2.35653 -0.52628  0.02993  0.63090  1.92292 
-#	
-#	Random effects:
-#	 Groups   Name        Variance Std.Dev.
-#	 ID.NEST  (Intercept) 0.5847   0.7646  
-#	 Residual             0.4951   0.7036  
-#	Number of obs: 133, groups:  ID.NEST, 72
-#	
-#	Fixed effects:
-#	              Estimate Std. Error t value
-#	(Intercept)  1.3214872  0.1932946   6.837
-#	nestvol      0.0016617  0.0007441   2.233
-#	nrbinTRUE   -0.7330281  0.2874392  -2.550
-#	
-#	Correlation of Fixed Effects:
-#	          (Intr) nestvl
-#	nestvol   -0.759       
-#	nrbinTRUE -0.352  0.089
-
-
+#### Not used - analysis without accounting for pronotum
+#           #ndis1 <- subset(ndis) ## not used
+#           #	lmer0 <- lmer(log(oovol) ~ nestvol * nrbin * females + (1 | ID.NEST), data=ndis1, REML='F'); anova(lmer0)
+#           #	lmer1 <- lmer(log(oovol) ~ (nestvol + nrbin + females)^2 + (1 | ID.NEST), data=ndis1, REML='F'); anova(lmer1)
+#           #	lmer2 <- lmer(log(oovol) ~ nestvol + nrbin + females + nestvol:females + nrbin:females + (1 | ID.NEST), data=ndis1, REML='F'); anova(lmer2)
+#           #	lmer3 <- lmer(log(oovol) ~ nestvol + nrbin + females + nrbin:females + (1 | ID.NEST), data=ndis1, REML='F'); anova(lmer3)
+#           #	lmer4 <- lmer(log(oovol) ~ nrbin + females + nrbin:females + (1 | ID.NEST), data=ndis1, REML='F'); anova(lmer4)
+#           #	lmer5 <- lmer(log(oovol) ~ nrbin + females + (1 | ID.NEST), data=ndis1, REML='F'); anova(lmer5)
+#           #	lmer6 <- lmer(log(oovol) ~ nrbin + (1 | ID.NEST), data=ndis1, REML='F'); anova(lmer6)
+#           
+#           lmer0 <- lmer(log(oovol) ~ nestvol * nrbin * females + (1 | ID.NEST), data=ndis1, REML='F'); anova(lmer0)
+#           lmer1 <- update(lmer0, ~.-nestvol:nrbin:females); anova(lmer0, lmer1); anova(lmer1)
+#           lmer2 <- update(lmer1, ~.-nrbin:nestvol); anova(lmer1, lmer2); anova(lmer2)
+#           lmer3 <- update(lmer2, ~.-females:nestvol); anova(lmer2, lmer3); anova(lmer3)
+#           lmer4 <- update(lmer3, ~.-females:nrbin); anova(lmer3, lmer4); anova(lmer4)
+#           lmer5 <- update(lmer4, ~.-females); anova(lmer4, lmer5); anova(lmer5)
+#           lmer6 <- update(lmer5, ~.-nrbin); anova(lmer5, lmer6); anova(lmer6)
+#           #	Data: ndis1
+#           #	Models:
+#           #	lmer6: log(oovol) ~ nestvol + (1 | ID.NEST)
+#           #	lmer5: log(oovol) ~ nestvol + nrbin + (1 | ID.NEST)
+#           #	      Df    AIC    BIC  logLik deviance  Chisq Chi Df Pr(>Chisq)  
+#           #	lmer6  4 375.53 387.09 -183.76   367.53                           
+#           #	lmer5  5 371.39 385.85 -180.70   361.39 6.1336      1    0.01326 *
+#           #	---
+#           #	Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+#           #	Analysis of Variance Table
+#           #	        Df Sum Sq Mean Sq F value
+#           #	nestvol  1 2.6805  2.6805  5.5143
+#           
+#           lmer7 <- update(lmer5, ~.-nestvol); anova(lmer5, lmer7)
+#           #	Data: ndis1
+#           #	Models:
+#           #	lmer7: log(oovol) ~ nrbin + (1 | ID.NEST)
+#           #	lmer5: log(oovol) ~ nestvol + nrbin + (1 | ID.NEST)
+#           #	      Df    AIC    BIC  logLik deviance  Chisq Chi Df Pr(>Chisq)  
+#           #	lmer7  4 374.23 385.79 -183.12   366.23                           
+#           #	lmer5  5 371.39 385.85 -180.70   361.39 4.8384      1    0.02783 *
+#           #	---
+#           #	Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+#           
+#           
+#           summary(lmer5)
+#           #	Linear mixed model fit by maximum likelihood  ['lmerMod']
+#           #	Formula: log(oovol) ~ nestvol + nrbin + (1 | ID.NEST)
+#           #	   Data: ndis1
+#           #	
+#           #	     AIC      BIC   logLik deviance df.resid 
+#           #	   371.4    385.8   -180.7    361.4      128 
+#           #	
+#           #	Scaled residuals: 
+#           #	     Min       1Q   Median       3Q      Max 
+#           #	-2.35653 -0.52628  0.02993  0.63090  1.92292 
+#           #	
+#           #	Random effects:
+#           #	 Groups   Name        Variance Std.Dev.
+#           #	 ID.NEST  (Intercept) 0.5847   0.7646  
+#           #	 Residual             0.4951   0.7036  
+#           #	Number of obs: 133, groups:  ID.NEST, 72
+#           #	
+#           #	Fixed effects:
+#           #	              Estimate Std. Error t value
+#           #	(Intercept)  1.3214872  0.1932946   6.837
+#           #	nestvol      0.0016617  0.0007441   2.233
+#           #	nrbinTRUE   -0.7330281  0.2874392  -2.550
+#           #	
+#           #	Correlation of Fixed Effects:
+#           #	          (Intr) nestvl
+#           #	nestvol   -0.759       
+#           #	nrbinTRUE -0.352  0.089
+#           
+#           
 
 
 ### FIGURE 5a and b
@@ -210,10 +207,7 @@ with(subset(nest, females<8 & vol > 500), points(log(rep.oovol)~vol, cex=2))
 mtext('(b)', 3, cex=2, line=0, padj=-0.5, adj=0)
 dev.off()
 
-
-##### Following analysis gives a lot of discrepancies - need to iron these out!
-
-
+  
 ##### 2015-08-04 need to incorporate pronotum size too
 lmer0 <- lmer(log(oovol) ~ scale(nestvol) * nrbin * scale(pronotum) + (1 | ID.NEST), data=ndis1, REML='F'); anova(lmer0)
 lmer1 <- update(lmer0, ~.-scale(nestvol):nrbin:scale(pronotum)); anova(lmer0, lmer1); summary(lmer1)

@@ -4,263 +4,19 @@
 
 
 ### Scripts called in this file:
-# figure_proprepro_vs_nestvolume.r
+# figure_proprepro_vs_nestvolume.r  **see end of file**
 
 ##############################################################################
 Is number reproductive correlated with nest volume?  Yes.
 ##############################################################################
 
-#with(dis, (c(NA, 1)[1+oovol>0] * oovol)) # Don't know what I was doing here
-
-
-### In multiply founded domiciles, are more females nonreproductive in small nests?
-
-glm1 <- with(subset(nest, !is.na(vol)&(repro+nonrepro>1)), glm(cbind(repro,nonrepro) ~ vol, family='quasibinomial'))
-glm2 <- with(subset(nest, !is.na(vol)&(repro+nonrepro>1)), glm(cbind(repro,nonrepro) ~ 1, family='quasibinomial'))
-anova(glm1,glm2, test='Chi')
-#	Analysis of Deviance Table
-#	
-#	Model 1: cbind(repro, nonrepro) ~ vol
-#	Model 2: cbind(repro, nonrepro) ~ 1
-#	  Resid. Df Resid. Dev Df Deviance  Pr(>Chi)    
-#	1        49     86.451                          
-#	2        50    106.135 -1  -19.683 0.0008264 ***
-#	---
-#	Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
-
-####   Resid. Df Resid. Dev Df Deviance  Pr(>Chi)           ### Results 2015-12-23 --- WHY AM I GETTING THIS DISCREPANCY? SEE OUTLIER DELETION BELOW
-####   1        49     84.116                               
-####   2        50    105.593 -1  -21.477 0.0005919 ***
-
-summary(glm1)
-#	
-#	Call:
-#	glm(formula = cbind(repro, nonrepro) ~ vol, family = "quasibinomial")
-#	
-#	Deviance Residuals: 
-#	    Min       1Q   Median       3Q      Max  
-#	-2.3805  -0.7056   0.7595   1.1906   1.9821  
-#	
-#	Coefficients:
-#	             Estimate Std. Error t value Pr(>|t|)  
-#	(Intercept) -0.197725   0.504841  -0.392   0.6970  
-#	vol          0.006181   0.002423   2.551   0.0139 *
-#	---
-#	Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
-#	
-#	(Dispersion parameter for quasibinomial family taken to be 1.760446)
-#	
-#	    Null deviance: 106.135  on 50  degrees of freedom
-#	Residual deviance:  86.451  on 49  degrees of freedom
-#	AIC: NA
-#	
-#	Number of Fisher Scoring iterations: 5
-
-
-(a<-summary(glm1)$coef)
-#	Coefficients:
-#	             Estimate Std. Error z value Pr(>|z|)  
-#	(Intercept) -1.180480   0.767593  -1.538   0.1241  
-#	vol          0.012042   0.005986   2.012   0.0442 *
-with(subset(nest, !is.na(vol)&(repro+nonrepro>1)), plot(jitter(I(repro/(repro+nonrepro))) ~ vol, xlab='Domicile volume', ylab='Proportion of females reproductive', las=1))
-curve(inv.logit(a[1,1]+a[2,1] * x), add=T, lty=2)
-curve(inv.logit((a[1,1]+a[1,2])+  (a[2,1]+a[2,2]) * x), add=T, lty=3)
-curve(inv.logit((a[1,1]-a[1,2])+(a[2,1]-a[2,2]) * x), add=T, lty=3)
-
-
-### exclude 3 outliers by restricting to vol < 450
-glm1 <- with(subset(nest, vol < 450 & !is.na(vol)&(repro+nonrepro>1)), glm(cbind(repro,nonrepro) ~ vol, family='binomial'))
-glm2 <- with(subset(nest, vol < 450 & !is.na(vol)&(repro+nonrepro>1)), glm(cbind(repro,nonrepro) ~ 1, family='binomial'))
-anova(glm1,glm2, test='Chi')
-#	Analysis of Deviance Table
-#	
-#	Model 1: cbind(repro, nonrepro) ~ vol
-#	Model 2: cbind(repro, nonrepro) ~ 1
-#	  Resid. Df Resid. Dev Df Deviance  Pr(>Chi)    
-#	1        46     72.234                          
-#	2        47    101.420 -1  -29.186 6.575e-08 ***    #### NOW 2015-12-23 and 2014 RESULTS EXACTLY MATCH
-#	---
-#	Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
-
-
-
-#### Does this pattern hold in the case of singletons?  YES - need to test whether pattern is stronger in cofounded nests
-  with(subset(nest, !is.na(vol)&(repro+nonrepro==1)), plot(jitter(I(repro/(repro+nonrepro))) ~ vol, xlab='Domicile volume', ylab='Proportion of females reproductive', las=1))
-
-
-
-### Same analysis but not excluding singletons
-  
-glm1 <- with(subset(nest, vol < 450 & !is.na(vol)), glm(cbind(repro,nonrepro) ~ vol * females, family='quasibinomial'))
-glm2 <- with(subset(nest, vol < 450 & !is.na(vol)), glm(cbind(repro,nonrepro) ~ vol + females, family='quasibinomial'))
-glm3 <- with(subset(nest, vol < 450 & !is.na(vol)), glm(cbind(repro,nonrepro) ~ females, family='quasibinomial'))
-glm4 <- with(subset(nest, vol < 450 & !is.na(vol)), glm(cbind(repro,nonrepro) ~ vol, family='quasibinomial'))
-
-anova(glm1,glm2, test='Chi')
-#	Analysis of Deviance Table
-#	
-#	Model 1: cbind(repro, nonrepro) ~ vol * I(repro + nonrepro)
-#	Model 2: cbind(repro, nonrepro) ~ vol + I(repro + nonrepro)
-#	  Resid. Df Resid. Dev Df Deviance Pr(>Chi)
-#	1        79     108.04                     
-#	2        80     108.86 -1 -0.81241   0.4145
-
-##  Resid. Df Resid. Dev Df Deviance Pr(>Chi)    ##### 2015-12-23 results - different from 2014
-##  1        79     106.39                     
-##  2        80     107.24 -1 -0.84526   0.4001
-
-anova(glm2,glm3, test='Chi')
-#	Analysis of Deviance Table
-#	
-#	Model 1: cbind(repro, nonrepro) ~ vol + I(repro + nonrepro)
-#	Model 2: cbind(repro, nonrepro) ~ I(repro + nonrepro)
-#	  Resid. Df Resid. Dev Df Deviance  Pr(>Chi)    
-#	1        80     108.86                          
-#	2        81     135.60 -1  -26.741 2.495e-06 ***
-#	---
-#	Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
-#	
-
-anova(glm2,glm4, test='Chi')
-#	Analysis of Deviance Table
-#	
-#	Model 1: cbind(repro, nonrepro) ~ vol + I(repro + nonrepro)
-#	Model 2: cbind(repro, nonrepro) ~ vol
-#	  Resid. Df Resid. Dev Df Deviance Pr(>Chi)   
-#	1        80     108.86                        
-#	2        81     118.56 -1  -9.7035 0.004563 **
-#	---
-#	Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
-#	
-
-summary(glm2)
-##	
-##	Call:
-##	glm(formula = cbind(repro, nonrepro) ~ vol + I(repro + nonrepro), 
-##	    family = "quasibinomial")
-##	
-##	Deviance Residuals: 
-##	    Min       1Q   Median       3Q      Max  
-##	-2.7962   0.0000   0.4228   0.8758   2.3272  
-##	
-##	Coefficients:
-##	                     Estimate Std. Error t value Pr(>|t|)    
-##	(Intercept)          0.552246   0.459294   1.202 0.232762    
-##	vol                  0.010739   0.002718   3.951 0.000167 ***
-##	I(repro + nonrepro) -0.367212   0.134649  -2.727 0.007848 ** 
-##	---
-##	Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
-##	
-##	(Dispersion parameter for quasibinomial family taken to be 1.206163)
-##	
-##	    Null deviance: 137.80  on 82  degrees of freedom
-##	Residual deviance: 108.86  on 80  degrees of freedom
-##	AIC: NA
-##	
-##	Number of Fisher Scoring iterations: 5
-
-
-
-#### NOT USED
-##        (a<-summary(glm2)$coef)
-##        
-##        #	Coefficients:
-##        #	             Estimate Std. Error z value Pr(>|z|)  
-##        #	(Intercept) -1.180480   0.767593  -1.538   0.1241  
-##        #	vol          0.012042   0.005986   2.012   0.0442 *
-##        with(subset(nest, vol < 450 & !is.na(vol)), plot(I(repro/(repro+nonrepro)) ~ vol, xlab='Domicile volume', ylab='Proportion of females reproductive', las=1, type='n'))
-##        with(subset(nest, !is.na(vol)&(repro+nonrepro>1)),  points(I(repro/(repro+nonrepro)) ~ vol, pch=21))
-##        with(subset(nest, !is.na(vol)&(repro+nonrepro==1)), points(I(repro/(repro+nonrepro)) ~ vol, pch=16))
-##        curve(inv.logit(a[1,1]+a[2,1] * x), add=T, lty=1)
-##        curve(inv.logit((a[1,1]+a[1,2])+  (a[2,1]+a[2,2]) * x), add=T, lty=3)
-##        curve(inv.logit((a[1,1]-a[1,2])+(a[2,1]-a[2,2]) * x), add=T, lty=3)
-##        #
-##        curve(inv.logit( (a[1,1]+a[3,1])+a[2,1] * x), add=T, lty=1, lwd=2)
-##        curve(inv.logit(((a[1,1]+a[3,1])+a[3,2])+  (a[2,1]+a[2,2]) * x), add=T, lty=3, lwd=2)
-##        curve(inv.logit(((a[1,1]+a[3,1])-a[3,2])+  (a[2,1]-a[2,2]) * x), add=T, lty=3, lwd=2)
-##        
-##        legend('bottomright', pch=21, pt.bg=c('black','white'), 
-##               legend=c('1 foundress','>1 foundresses'), bty='n', pt.cex=1.5, inset=0.05,
-##               lty=c(1, 1), lwd=c(2, 1))
-
- 
-
-##### Draw 2-panel figure for paper
-source('figure_proprepro_vs_nestvolume.r')
+1. Mixed model (individual level) analysis
+2. Nest-level analysis
   
 
-### Try this analysis as a mixed model focusing on individuals
- 
-##  dis$females <- dis$no.repro + dis$no.nonrepro   ### 2015: I have migrated this to import_dissections.r
-
-#glm1 <- with(subset(nest, vol < 450 & !is.na(vol)), glm(cbind(repro,nonrepro) ~ vol * I(repro+nonrepro==1), family='quasibinomial'))
-
-dis1 <- subset(dis, nestvol < 450 & !is.na(nestvol))
-
-#	lmer1 <- glmer((1*repro) ~ nestvol * I(females>1) + (1 | ID.NEST), family='binomial', data=dis1)
-#	lmer2 <- update(lmer1, ~.-nestvol:I(females>1)); anova(lmer1,lmer2)
-#	lmer3 <- update(lmer2, ~.-I(females>1)); anova(lmer2,lmer3)
-#	#	Data: dis1
-#	#	Models:
-#	#	lmer3: (1 * repro) ~ nestvol + (1 | ID.NEST)
-#	#	lmer2: (1 * repro) ~ nestvol + I(females > 1) + (1 | ID.NEST)
-#	#	      Df    AIC    BIC  logLik deviance  Chisq Chi Df Pr(>Chisq)   
-#	#	lmer3  3 167.05 176.47 -80.525   161.05                            
-#	#	lmer2  4 162.40 174.97 -77.201   154.40 6.6476      1   0.009929 **
-#	#	---
-#	#	Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
-#	
-#	lmer4 <- update(lmer2, ~.-nestvol); anova(lmer2,lmer4)
-#	#	Data: dis1
-#	#	Models:
-#	#	lmer4: (1 * repro) ~ I(females > 1) + (1 | ID.NEST)
-#	#	lmer2: (1 * repro) ~ nestvol + I(females > 1) + (1 | ID.NEST)
-#	#	      Df    AIC    BIC  logLik deviance Chisq Chi Df Pr(>Chisq)    
-#	#	lmer4  3 176.64 186.07 -85.321   170.64                            
-#	#	lmer2  4 162.40 174.97 -77.201   154.40 16.24      1   5.58e-05 ***
-#	#	---
-#	#	Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
-#	
-#	summary(lmer2)
-#	#	Generalized linear mixed model fit by maximum likelihood (Laplace Approximation) ['glmerMod']
-#	#	 Family: binomial  ( logit )
-#	#	Formula: (1 * repro) ~ nestvol + I(females > 1) + (1 | ID.NEST)
-#	#	   Data: dis1
-#	#	
-#	#	     AIC      BIC   logLik deviance df.resid 
-#	#	   162.4    175.0    -77.2    154.4      167 
-#	#	
-#	#	Scaled residuals: 
-#	#	    Min      1Q  Median      3Q     Max 
-#	#	-2.6815  0.0524  0.2144  0.3631  1.3765 
-#	#	
-#	#	Random effects:
-#	#	 Groups  Name        Variance Std.Dev.
-#	#	 ID.NEST (Intercept) 2.509    1.584   
-#	#	Number of obs: 171, groups:  ID.NEST, 81
-#	#	
-#	#	Fixed effects:
-#	#	                   Estimate Std. Error z value Pr(>|z|)   
-#	#	(Intercept)         0.94716    0.68623   1.380   0.1675   
-#	#	nestvol             0.01556    0.00473   3.289   0.0010 **
-#	#	I(females > 1)TRUE -2.07494    0.88585  -2.342   0.0192 * 
-#	#	---
-#	#	Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
-#	#	
-#	#	Correlation of Fixed Effects:
-#	#	            (Intr) nestvl
-#	#	nestvol     -0.166       
-#	#	I(fm>1)TRUE -0.507 -0.611
-#	
-
-
-###### Next: analyse as a MIXED MODEL  while accounting for individual size as indicated by 2015-08-03 ovaries vs body size.r
-
-# dis$devoocyte <- NA                     ### Migrated to import.dissections.r
-# dis$devoocyte[dis$oocyte==0] <- 'No'
-# dis$devoocyte[dis$oocyte>0] <- 'Yes'
-
-dis1 <- subset(dis, nestvol < 450 & !is.na(nestvol))  ### remove outlier nests
+### FIRST: Try this analysis as a mixed model focusing on individuals
+  
+###### Analyse as a MIXED MODEL  while accounting for individual size as indicated by 2015-08-03 ovaries vs body size.r
 
 glmm1 <- glmer(1*(oocyte>0) ~ scale(pronotum) * scale(nestvol) * I(females) + (1 | ID.NEST), data=dis1, family='binomial', control=glmerControl(optimizer = "bobyqa"))
 glmm2 <- update(glmm1, ~.-scale(pronotum) : scale(nestvol) : I(females))
@@ -570,4 +326,182 @@ overdisp_fun(glmm1)
 #	chisq       ratio         rdf           p 
 #	131.7532436   0.7279185 181.0000000   0.9976969 
 #	
+
+
+### NEST-LEVEL ANALYSIS: In multiply founded domiciles, are more females nonreproductive in small nests? YES.
+
+glm1 <- with(subset(nest, !is.na(vol)&(repro+nonrepro>1)), glm(cbind(repro,nonrepro) ~ vol, family='quasibinomial'))
+glm2 <- with(subset(nest, !is.na(vol)&(repro+nonrepro>1)), glm(cbind(repro,nonrepro) ~ 1, family='quasibinomial'))
+anova(glm1,glm2, test='Chi')
+#	Analysis of Deviance Table
+#	
+#	Model 1: cbind(repro, nonrepro) ~ vol
+#	Model 2: cbind(repro, nonrepro) ~ 1
+#	  Resid. Df Resid. Dev Df Deviance  Pr(>Chi)    
+#	1        49     86.451                          
+#	2        50    106.135 -1  -19.683 0.0008264 ***
+#	---
+#	Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+####   Resid. Df Resid. Dev Df Deviance  Pr(>Chi)           ### Results 2015-12-23 --- WHY AM I GETTING THIS DISCREPANCY? SEE OUTLIER DELETION BELOW
+####   1        49     84.116                               
+####   2        50    105.593 -1  -21.477 0.0005919 ***
+
+summary(glm1)
+#	
+#	Call:
+#	glm(formula = cbind(repro, nonrepro) ~ vol, family = "quasibinomial")
+#	
+#	Deviance Residuals: 
+#	    Min       1Q   Median       3Q      Max  
+#	-2.3805  -0.7056   0.7595   1.1906   1.9821  
+#	
+#	Coefficients:
+#	             Estimate Std. Error t value Pr(>|t|)  
+#	(Intercept) -0.197725   0.504841  -0.392   0.6970  
+#	vol          0.006181   0.002423   2.551   0.0139 *
+#	---
+#	Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+#	
+#	(Dispersion parameter for quasibinomial family taken to be 1.760446)
+#	
+#	    Null deviance: 106.135  on 50  degrees of freedom
+#	Residual deviance:  86.451  on 49  degrees of freedom
+#	AIC: NA
+#	
+#	Number of Fisher Scoring iterations: 5
+
+
+(a<-summary(glm1)$coef)
+#	Coefficients:
+#	             Estimate Std. Error z value Pr(>|z|)  
+#	(Intercept) -1.180480   0.767593  -1.538   0.1241  
+#	vol          0.012042   0.005986   2.012   0.0442 *
+with(subset(nest, !is.na(vol)&(repro+nonrepro>1)), plot(jitter(I(repro/(repro+nonrepro))) ~ vol, xlab='Domicile volume', ylab='Proportion of foundresses reproductive', las=1))
+curve(inv.logit(a[1,1]+a[2,1] * x), add=T, lty=2)
+curve(inv.logit((a[1,1]+a[1,2])+  (a[2,1]+a[2,2]) * x), add=T, lty=3)
+curve(inv.logit((a[1,1]-a[1,2])+(a[2,1]-a[2,2]) * x), add=T, lty=3)
+
+
+### exclude 3 outliers by restricting to vol < 450
+glm1 <- with(subset(nest, vol < 450 & !is.na(vol)&(repro+nonrepro>1)), glm(cbind(repro,nonrepro) ~ vol, family='binomial'))
+glm2 <- with(subset(nest, vol < 450 & !is.na(vol)&(repro+nonrepro>1)), glm(cbind(repro,nonrepro) ~ 1, family='binomial'))
+anova(glm1,glm2, test='Chi')
+#	Analysis of Deviance Table
+#	
+#	Model 1: cbind(repro, nonrepro) ~ vol
+#	Model 2: cbind(repro, nonrepro) ~ 1
+#	  Resid. Df Resid. Dev Df Deviance  Pr(>Chi)    
+#	1        46     72.234                          
+#	2        47    101.420 -1  -29.186 6.575e-08 ***    #### NOW 2015-12-23 and 2014 RESULTS EXACTLY MATCH
+#	---
+#	Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+
+
+#### Does this pattern hold in the case of singletons?  YES - need to test whether pattern is stronger in cofounded nests
+  with(subset(nest, !is.na(vol)&(repro+nonrepro==1)), plot(jitter(I(repro/(repro+nonrepro))) ~ vol, xlab='Domicile volume', ylab='Proportion of foundresses reproductive', las=1))
+
+
+
+### Same analysis but not excluding singletons
+  
+glm1 <- with(subset(nest, vol < 450 & !is.na(vol)), glm(cbind(repro,nonrepro) ~ vol * females, family='quasibinomial'))
+glm2 <- with(subset(nest, vol < 450 & !is.na(vol)), glm(cbind(repro,nonrepro) ~ vol + females, family='quasibinomial'))
+glm3 <- with(subset(nest, vol < 450 & !is.na(vol)), glm(cbind(repro,nonrepro) ~ females, family='quasibinomial'))
+glm4 <- with(subset(nest, vol < 450 & !is.na(vol)), glm(cbind(repro,nonrepro) ~ vol, family='quasibinomial'))
+
+anova(glm1,glm2, test='Chi')
+#	Analysis of Deviance Table
+#	
+#	Model 1: cbind(repro, nonrepro) ~ vol * I(repro + nonrepro)
+#	Model 2: cbind(repro, nonrepro) ~ vol + I(repro + nonrepro)
+#	  Resid. Df Resid. Dev Df Deviance Pr(>Chi)
+#	1        79     108.04                     
+#	2        80     108.86 -1 -0.81241   0.4145
+
+##  Resid. Df Resid. Dev Df Deviance Pr(>Chi)    ##### 2015-12-23 results - different from 2014
+##  1        79     106.39                     
+##  2        80     107.24 -1 -0.84526   0.4001
+
+anova(glm2,glm3, test='Chi')
+#	Analysis of Deviance Table
+#	
+#	Model 1: cbind(repro, nonrepro) ~ vol + I(repro + nonrepro)
+#	Model 2: cbind(repro, nonrepro) ~ I(repro + nonrepro)
+#	  Resid. Df Resid. Dev Df Deviance  Pr(>Chi)    
+#	1        80     108.86                          
+#	2        81     135.60 -1  -26.741 2.495e-06 ***
+#	---
+#	Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+#	
+
+anova(glm2,glm4, test='Chi')
+#	Analysis of Deviance Table
+#	
+#	Model 1: cbind(repro, nonrepro) ~ vol + I(repro + nonrepro)
+#	Model 2: cbind(repro, nonrepro) ~ vol
+#	  Resid. Df Resid. Dev Df Deviance Pr(>Chi)   
+#	1        80     108.86                        
+#	2        81     118.56 -1  -9.7035 0.004563 **
+#	---
+#	Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+#	
+
+summary(glm2)
+##	
+##	Call:
+##	glm(formula = cbind(repro, nonrepro) ~ vol + I(repro + nonrepro), 
+##	    family = "quasibinomial")
+##	
+##	Deviance Residuals: 
+##	    Min       1Q   Median       3Q      Max  
+##	-2.7962   0.0000   0.4228   0.8758   2.3272  
+##	
+##	Coefficients:
+##	                     Estimate Std. Error t value Pr(>|t|)    
+##	(Intercept)          0.552246   0.459294   1.202 0.232762    
+##	vol                  0.010739   0.002718   3.951 0.000167 ***
+##	I(repro + nonrepro) -0.367212   0.134649  -2.727 0.007848 ** 
+##	---
+##	Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+##	
+##	(Dispersion parameter for quasibinomial family taken to be 1.206163)
+##	
+##	    Null deviance: 137.80  on 82  degrees of freedom
+##	Residual deviance: 108.86  on 80  degrees of freedom
+##	AIC: NA
+##	
+##	Number of Fisher Scoring iterations: 5
+
+
+
+#### NOT USED
+##        (a<-summary(glm2)$coef)
+##        
+##        #	Coefficients:
+##        #	             Estimate Std. Error z value Pr(>|z|)  
+##        #	(Intercept) -1.180480   0.767593  -1.538   0.1241  
+##        #	vol          0.012042   0.005986   2.012   0.0442 *
+##        with(subset(nest, vol < 450 & !is.na(vol)), plot(I(repro/(repro+nonrepro)) ~ vol, xlab='Domicile volume', ylab='Proportion of females reproductive', las=1, type='n'))
+##        with(subset(nest, !is.na(vol)&(repro+nonrepro>1)),  points(I(repro/(repro+nonrepro)) ~ vol, pch=21))
+##        with(subset(nest, !is.na(vol)&(repro+nonrepro==1)), points(I(repro/(repro+nonrepro)) ~ vol, pch=16))
+##        curve(inv.logit(a[1,1]+a[2,1] * x), add=T, lty=1)
+##        curve(inv.logit((a[1,1]+a[1,2])+  (a[2,1]+a[2,2]) * x), add=T, lty=3)
+##        curve(inv.logit((a[1,1]-a[1,2])+(a[2,1]-a[2,2]) * x), add=T, lty=3)
+##        #
+##        curve(inv.logit( (a[1,1]+a[3,1])+a[2,1] * x), add=T, lty=1, lwd=2)
+##        curve(inv.logit(((a[1,1]+a[3,1])+a[3,2])+  (a[2,1]+a[2,2]) * x), add=T, lty=3, lwd=2)
+##        curve(inv.logit(((a[1,1]+a[3,1])-a[3,2])+  (a[2,1]-a[2,2]) * x), add=T, lty=3, lwd=2)
+##        
+##        legend('bottomright', pch=21, pt.bg=c('black','white'), 
+##               legend=c('1 foundress','>1 foundresses'), bty='n', pt.cex=1.5, inset=0.05,
+##               lty=c(1, 1), lwd=c(2, 1))
+
+ 
+##### Draw 2-panel figure for paper
+source('figure_proprepro_vs_nestvolume.r')
+
+
+### --- end ----
 

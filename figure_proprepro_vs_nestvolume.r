@@ -2,7 +2,7 @@
 
 #### Figure: proportion reproductive versus domicile size and no of foundresses
 
-pdf('2015-12-20 Proportion reproductive vs vol & foundresses.pdf', width=10, height=6)
+pdf('2016-01-14 Proportion reproductive vs vol & foundresses.pdf', width=10, height=6)
 
 source('LEGEND.r')
 
@@ -17,7 +17,7 @@ p3 <- predict(glm2, newdata=nd3, se.fit=T)
 nd4 <- data.frame(vol=seq(0, 450, length.out=100), females=rep(7, 100))
 p4 <- predict(glm2, newdata=nd4, se.fit=T)
 
-with(subset(nest, vol < 450 & !is.na(vol)), plot(I(repro/(repro+nonrepro)) ~ vol, xlab=expression('Domicile volume ('*mm^{3}*')'), ylab='Proportion of females reproductive', las=1, type='n'))
+with(subset(nest, vol < 450 & !is.na(vol)), plot(I(repro/(repro+nonrepro)) ~ vol, xlab=expression('Domicile volume ('*mm^{3}*')'), ylab='Proportion of foundresses reproductive', las=1, type='n'))
 with(subset(nest, !is.na(vol)&(repro+nonrepro>1)),  points(I(repro/(repro+nonrepro)) ~ vol, pch=21))
 with(subset(nest, !is.na(vol)&(repro+nonrepro==1)), points(I(repro/(repro+nonrepro)) ~ vol, pch=16)) 
 
@@ -37,7 +37,8 @@ points(inv.logit(p4$fit) ~ nd1$vol, type='l', lwd=4)
 
 
 LEGEND( x="bottomright", 
-        legend=c("1 female",">1 females", "3 females", "5 females","7 females"),
+        legend=c("1",">1", "3", "5","7"),
+        title='Foundresses',
         pch=c(16, 21, 0, 0, 0),
         pt.col=c('black','black', 0, 0, 0), 
         pt.bg=c('black','white', 0, 0, 0),
@@ -46,7 +47,7 @@ LEGEND( x="bottomright",
         line.col=rep('black', 5), bty='n')			### See hacked LEGEND() function at bottom of document 
 ## Found at: http://stackoverflow.com/questions/19053440/r-legend-with-points-and-lines-being-different-colors-for-the-same-legend-item
 
-mtext('(a)', 3, cex=2, line=0, padj=-0.5, adj=0s)
+mtext('(a)', 3, cex=2, line=0, padj=-0.5, adj=0)
 
 nd1 <- data.frame(females=seq(1, 7, length.out=100), vol=rep(100, 100))
 p1 <- predict(glm2, newdata=nd1, se.fit=T)
@@ -60,7 +61,7 @@ p4 <- predict(glm2, newdata=nd4, se.fit=T)
 #dev.off()
 #pdf('2015-08-04 Proportion reproductive vs vol & foundresses.pdf', width=12, height=6)
 
-with(subset(nest, vol < 450 & !is.na(vol) & females>0), plot(I(repro/(repro+nonrepro)) ~ females, xlab="Foundresses per domicile", ylab='Proportion of females reproductive', las=1, type='n'))
+with(subset(nest, vol < 450 & !is.na(vol) & females>0), plot(I(repro/(repro+nonrepro)) ~ females, xlab="Foundresses per domicile", ylab='Proportion of foundresses reproductive', las=1, type='n'))
 with(subset(nest, vol < 450), points(jitter(I(repro/(repro+nonrepro))) ~ jitter(females), pch=21)) 
 
 points(inv.logit(p1$fit) ~ nd1$females, type='l')
