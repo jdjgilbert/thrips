@@ -411,6 +411,13 @@ glm2 <- with(subset(nest, vol < 450 & !is.na(vol)), glm(cbind(repro,nonrepro) ~ 
 glm3 <- with(subset(nest, vol < 450 & !is.na(vol)), glm(cbind(repro,nonrepro) ~ females, family='quasibinomial'))
 glm4 <- with(subset(nest, vol < 450 & !is.na(vol)), glm(cbind(repro,nonrepro) ~ vol, family='quasibinomial'))
 
+##  ## Redo this analysis wtihout excluding outliers (TEST, data not reported)
+##  glm1 <- with(subset(nest, !is.na(vol)), glm(cbind(repro,nonrepro) ~ vol * females, family='quasibinomial'))
+##  glm2 <- with(subset(nest, !is.na(vol)), glm(cbind(repro,nonrepro) ~ vol + females, family='quasibinomial'))
+##  glm3 <- with(subset(nest, !is.na(vol)), glm(cbind(repro,nonrepro) ~ females, family='quasibinomial'))
+##  glm4 <- with(subset(nest, !is.na(vol)), glm(cbind(repro,nonrepro) ~ vol, family='quasibinomial'))
+
+
 anova(glm1,glm2, test='Chi')
 #	Analysis of Deviance Table
 #	

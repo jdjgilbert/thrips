@@ -30,16 +30,15 @@ nrow(dat <- subset(dat.all, !STAGE%in%c('OLD','ABANDONED','EXCLUDE','NO EGGS','N
 ##    axis(side=1, at=c(2, 5), labels=c('Small nest', 'Large nest'))
 ##    dev.off()
  
-pdf('2015-12-20 percapita vs foundress in large vs small nests.pdf', width=6, height=6)
+ 
+pdf('2016-01-14 percapita vs foundress in large vs small nests.pdf', width=6, height=6)
 ####### Call "small nest" a nest < 33% quantile of nest volume
 par(family='serif')
-with(subset(dat, OTHER.EGGS==0), boxplot(percapita ~ c('Small','Large')[1+I(vol>quantile(dat$vol, 0.33, na.rm=T))] * cut(foundress, breaks=c(0,1.5,3.5,30)), notch=F, col=rep(c('white','grey'), 3), xaxt='n', ylab='Per capita offspring', las=1))
-axis(side=1, at=c(1.5, 3.5, 5.5), labels=c('1 Foundress', '2-3 foundresses', '>3 foundresses'))
-legend('topright', fill=c('white','grey'), legend=c('Large nest','Small nest'), bty='n')
+with(subset(dat, OTHER.EGGS==0), boxplot(percapita ~ c('Small','Medium/Large')[1+I(vol>quantile(dat$vol, 0.5, na.rm=T))] * cut(foundress, breaks=c(0,1.5,3.5,30)), notch=F, col=rep(c('white','grey'), 3), xaxt='n', ylab='Per capita offspring', las=1))
+ axis(side=1, at=c(1.5, 3.5, 5.5), labels=c('1 Foundress', '2-3 foundresses', '>3 foundresses'))
+legend('topright', fill=c('white','grey'), legend=c('Medium/Large nest','Small nest'), bty='n')
 dev.off()
   
-
-
 ## Does nest productivity scale differently with foundresses depending on nest volume?  YES.
 
 ## NOTE PER CAPITA RATHER THAN TOTAL OFFSPRING 
@@ -99,7 +98,7 @@ summary(m0qp)
 #		Number of Fisher Scoring iterations: 6
 
    
-pdf('2015-12-20 percapita vs volume.pdf', width=6, height=6)
+pdf('2016-01-14 percapita vs volume.pdf', width=6, height=6)
 par(family='serif')
 with(d1, plot(percapita ~ vol, type='p', ylab='Per capita offspring', xlab=expression(Domicile~volume~(mm^{3})), las=1))
 with(subset(d1, fcut==1), points(percapita ~ vol, pch=16, col='black'))
@@ -120,7 +119,7 @@ points(M1pred$fit[a] ~ nd1$vol[a], type='l', col='black')
 points(M1pred$fit[a]+2*M1pred$se.fit[a] ~ nd1$vol[a], type='l', lty=2, col='black')
 points(M1pred$fit[a]-2*M1pred$se.fit[a] ~ nd1$vol[a], type='l', lty=2, col='black')
 
-legend('topright', pch=21, pt.bg=c('black','white'), legend=c('1 female','>1 females'), bty='n', pt.cex=1.5, inset=0.05)
+legend('topright', pch=21, pt.bg=c('black','white'), legend=c('1 foundress','>1 foundress'), bty='n', pt.cex=1.5, inset=0.05)
 dev.off()
  
 ## model checking
